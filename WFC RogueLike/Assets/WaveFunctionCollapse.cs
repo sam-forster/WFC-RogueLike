@@ -32,7 +32,7 @@ public static class WaveFunctionCollapse {
         int max = potentialWorld.GetLength(0) * potentialWorld.GetLength(1);
         for (int i = 0; i < max; i++) {
             if (WorldComplete(collapsedWorld)) {
-                Debug.Log("WORLD COMPLETED");
+                Debug.Log("WORLD COMPLETED in " + i + " calls");
                 break;
             }
             /*
@@ -87,29 +87,136 @@ public static class WaveFunctionCollapse {
 
     }
 
-    private static GameObject[,] ConvertToSingleItemArray(List<GameObject>[,] world) {
+    
+    private static List<GameObject>[,] Propagate(List<GameObject>[,] world, Vector2Int sourceCell, int iteration = 0) {
 
-        Debug.Log("ConvertToSingleItemArray");
-        
-        int width = world.GetLength(0);
-        int height = world.GetLength(1);
-        GameObject[,] completeList = new GameObject[width,height];
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                completeList[i, j] = world[i, j][0];
+        iteration++;
+        bool changes = false;
+        List<Vector2Int> temp = FindValidNeighbours(world, sourceCell);
+        List<Vector2Int> neighbours = new List<Vector2Int>();
+        foreach (Vector2Int testNeighbour in temp) {
+            if (world[testNeighbour.x, testNeighbour.y].Count > 1) {
+                neighbours.Add(testNeighbour);
             }
         }
 
-        return completeList;
+
+        // Base Case
+        if (neighbours.Count == 0) {
+            Debug.Log("No Neighbours to Test");
+            return world;
+        }
+
+        List<Vector2Int> neighboursThatHaveChanged = new List<Vector2Int>();
+
+        foreach (Vector2Int neighbour in neighbours) {
+
+
+            // Get the direction of the neighbour relative to the sourceCell
+            Vector2Int directionVector = neighbour - sourceCell;
+            AvailableNeighbours.Direction directionName = CalculateDirectionFromVector(directionVector);
+
+            Debug.Log("Vector: " + directionVector + " = " + directionName);
+
+            // Getting the list of all the potential gameobjects the neighbour could be
+            List<GameObject> compareList = new List<GameObject>();
+            foreach (GameObject sourceGO in world[sourceCell.x, sourceCell.y]) {
+                compareList.AddRange(AvailableNeighbours.GetAvailableTiles(sourceGO, directionName));
+                
+            }
+            compareList = RemoveDuplicates(compareList);
+
+
+            // Changing the neighbour list so it only contains valid gameobjects
+            List<GameObject> newNeighbourList = new List<GameObject>();
+            foreach (GameObject testGO in world[neighbour.x, neighbour.y]) {
+                if (compareList.Contains(testGO)) {
+                    newNeighbourList.Add(testGO);
+                } else {
+                    Debug.Log("Removed: " + testGO.name);
+                    changes = true;
+                    neighboursThatHaveChanged.Add(neighbour);
+                }
+            }
+
+            world[neighbour.x, neighbour.y] = newNeighbourList;
+
+
+            // TODO list
+            // Calculate the direction of the neighbour relative to the source - Done
+            // Reduce the neighbour to the correct available neighbours relative to the source cell - Done
+            // If a neighbour has been reduced, it needs to be a source of propagation - Done
+            // If no changes are made, then the world needs to be returned as a base case - Done
+        }
+
+        // Checking if any neighbours have changed.
+        // If they have, recursively call Propagate on each neighbour
+        neighboursThatHaveChanged = RemoveDuplicates(neighboursThatHaveChanged);
+        if (neighboursThatHaveChanged.Count > 0) {
+            foreach (Vector2Int neighbour in neighbours) {
+                world = Propagate(world, neighbour, iteration);
+            }
+        }
+        
+        // Base Case
+        return world;
 
     }
+
+
+    // NoDuplicates Could be made Generic
+
+    private static List<GameObject> RemoveDuplicates(List<GameObject> list) {
+
+        List<GameObject> noDuplicates = new List<GameObject>();
+        foreach (GameObject item in list) {
+            if (!noDuplicates.Contains(item)) {
+                noDuplicates.Add(item);
+            }
+        }
+        return noDuplicates;
+    }
+
+    private static List<Vector2Int> RemoveDuplicates(List<Vector2Int> list) {
+        List<Vector2Int> noDuplicates = new List<Vector2Int>();
+        foreach (Vector2Int item in list) {
+            if (!noDuplicates.Contains(item)) {
+                noDuplicates.Add(item);
+            }
+        }
+        return noDuplicates;
+    }
+
+    private static AvailableNeighbours.Direction CalculateDirectionFromVector(Vector2Int directionVector) {
+
+        if (directionVector.Equals(Vector2Int.up)) {
+            return AvailableNeighbours.Direction.North;
+        }
+        if (directionVector.Equals(Vector2Int.down)) {
+            return AvailableNeighbours.Direction.South;
+        }
+        if (directionVector.Equals(Vector2Int.left)) {
+            return AvailableNeighbours.Direction.West;
+        }
+        if (directionVector.Equals(Vector2Int.right)) {
+            return AvailableNeighbours.Direction.East;
+        }
+
+        Debug.LogError("WTF have you inputted??");
+        Debug.Log(directionVector);
+
+        return AvailableNeighbours.Direction.North;
+
+
+    }
+
+
 
 
     // Recursive algorithm that propagates updates of the world each time a new tiles entropy is changed
 
     // PROBLEMS: SEEMS TO RECURSE INFINITELY - Sorted... I think
-    private static List<GameObject>[,] Propagate(List<GameObject>[,] world, Vector2Int center, int iteration = 0) {
+    private static List<GameObject>[,] PropagateOld(List<GameObject>[,] world, Vector2Int center, int iteration = 0) {
 
         //changedFlags[center.x, center.y] = true;
         iteration++;
@@ -206,6 +313,24 @@ public static class WaveFunctionCollapse {
 
         return world;
         
+    }
+
+    private static GameObject[,] ConvertToSingleItemArray(List<GameObject>[,] world) {
+
+        Debug.Log("ConvertToSingleItemArray");
+
+        int width = world.GetLength(0);
+        int height = world.GetLength(1);
+        GameObject[,] completeList = new GameObject[width, height];
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                completeList[i, j] = world[i, j][0];
+            }
+        }
+
+        return completeList;
+
     }
 
     private static bool AreListsEqual(List<GameObject> listOne, List<GameObject> listTwo) {
