@@ -108,7 +108,9 @@ MonoBehaviour:
   - {fileID: 3763158822719778408, guid: d11b643c01ee1df4c9cb7a5bee96b804, type: 3}
   - {fileID: 556453763625615199, guid: 1ad0785455c8ea44e8b552a9123d6d90, type: 3}
   west:
-  - {fileID: 3119120181550628217, guid: ddac0f4dee9d98f469563711087865c1, type: 3}
+  - {fileID: 6107513835954189935, guid: 125183506c1453d4bad6c5fab22a38c4, type: 3}
+  - {fileID: 3566712076160608182, guid: a99c49dbede866a4f979a0858ec252cf, type: 3}
+  - {fileID: 5587114721551724707, guid: d9fa55cb1ec0fc84f857293d575b61fb, type: 3}
 --- !u!114 &3660103748622329723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121,7 +123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a834bfca663adc848a408622cfea1dae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NorthInt: 0a00000006000000
+  NorthInt: 0a000000060000000b000000
   EastInt: 01000000
-  SouthInt: 0a00000009000000
-  WestInt: 03000000
+  SouthInt: 0a000000090000000d000000
+  WestInt: 02000000

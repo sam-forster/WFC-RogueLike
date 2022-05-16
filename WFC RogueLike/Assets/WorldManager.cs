@@ -88,7 +88,7 @@ public class WorldManager : MonoBehaviour {
     
     public IEnumerator Delay() {
         foundWorld = true;
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1f);
         foundWorld = false;
     }
 

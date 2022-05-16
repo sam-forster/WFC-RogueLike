@@ -98,13 +98,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 6
   north:
-  - {fileID: 3119120181550628217, guid: ddac0f4dee9d98f469563711087865c1, type: 3}
+  - {fileID: 2884555291484091927, guid: 0b9b49b7db8a6854daff0bd090eb35dd, type: 3}
+  - {fileID: 5587114721551724707, guid: d9fa55cb1ec0fc84f857293d575b61fb, type: 3}
+  - {fileID: 3763158822719778408, guid: d11b643c01ee1df4c9cb7a5bee96b804, type: 3}
   east:
   - {fileID: 7447183712137761513, guid: 17bed1a95ff68bc439357d66001f5ac8, type: 3}
   south:
   - {fileID: 4561563576768085424, guid: e57acf345cd49fc478a44c4de46b72cf, type: 3}
   west:
-  - {fileID: 3119120181550628217, guid: ddac0f4dee9d98f469563711087865c1, type: 3}
+  - {fileID: 6107513835954189935, guid: 125183506c1453d4bad6c5fab22a38c4, type: 3}
+  - {fileID: 5587114721551724707, guid: d9fa55cb1ec0fc84f857293d575b61fb, type: 3}
+  - {fileID: 3566712076160608182, guid: a99c49dbede866a4f979a0858ec252cf, type: 3}
 --- !u!114 &6066035900911814423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,7 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a834bfca663adc848a408622cfea1dae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NorthInt: 
-  EastInt: 
-  SouthInt: 
-  WestInt: 
+  NorthInt: 02000000
+  EastInt: 04000000
+  SouthInt: 0a000000
+  WestInt: 02000000

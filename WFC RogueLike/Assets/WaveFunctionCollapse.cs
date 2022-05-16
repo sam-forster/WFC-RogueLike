@@ -133,12 +133,22 @@ public static  class WaveFunctionCollapse {
             foreach (int item in currentNeighbours) {
                 if (compareList.Contains(item)) {
                     newNeighbours.Add(item);
+                } else {
+                    changedNeighbours.Add(neighbour);
                 }
             }
 
             world[neighbour.x, neighbour.y] = newNeighbours;
         }
-
+        /*
+        if (changedNeighbours.Count > 0) {
+            foreach (Vector2Int neighbour in changedNeighbours) {
+                world = Propagate(world, neighbour);
+            }
+            
+            
+        }
+        */
 
         return world;
     }
