@@ -7,21 +7,24 @@ public static class WaveFunctionCollapse {
     public static GameObject defaultTile;
     private static bool canGo = true;
 
-    public static List<GameObject>[,] Initialise(List<GameObject>[,] world, GameObject tile) {
+    public static List<GameObject>[,] Initialise(List<GameObject>[,] world) {
 
 
-
-
-
-        defaultTile = tile;
         Vector2Int position = new Vector2Int(world.GetLength(0) / 2, world.GetLength(1) / 2);
-        //Vector2Int position = new Vector2Int(Random.Range(0, world.GetLength(0)), Random.Range(0, world.GetLength(1)));
-        world[position.x, position.y] = new List<GameObject> { tile };
+        world[position.x, position.y] = new List<GameObject>();
+        world[position.x, position.y].Add(WorldManager.tileInstances[2]);
+
         world = Propagate(world, position);
+        
         return world;
+        Debug.Log("Initialise Complete");
     }
 
     public static GameObject[,] Complete(List<GameObject>[,] potentialWorld) {
+
+        potentialWorld = Initialise(potentialWorld);
+        Debug.Log("This Bit Was Passed");
+
 
         List<GameObject>[,] collapsedWorld = null;
 
@@ -44,22 +47,8 @@ public static class WaveFunctionCollapse {
             collapsedWorld = Recursive_Complete(collapsedWorld);
         }
         
-        Debug.Log("START OF WHILE");
+        //Debug.Log("START OF WHILE");
 
-
-        /*
-
-        while (!complete) {
-            collapsedWorld = Recursive_Complete(collapsedWorld);
-            if (WorldComplete(collapsedWorld)) {
-                complete = true;
-            }
-
-            count++;
-            Debug.Log("Iteration: " + count);
-        }
-
-        */
 
         return ConvertToSingleItemArray(collapsedWorld);
     }
@@ -76,12 +65,11 @@ public static class WaveFunctionCollapse {
         }*/
 
         Vector2Int position = FindLowestEntropy(world);
-        Debug.Log("Lowest Entropy: " + position);
         world[position.x, position.y] = CollapseWave(world[position.x, position.y]);
         
 
         world = Propagate(world, position);
-
+        
         //world = Recursive_Complete(world);    //THIS IS THE RECURSIVE PART OF THIS METHOD
         return world;
 
@@ -116,7 +104,7 @@ public static class WaveFunctionCollapse {
             Vector2Int directionVector = neighbour - sourceCell;
             AvailableNeighbours.Direction directionName = CalculateDirectionFromVector(directionVector);
 
-            Debug.Log("Vector: " + directionVector + " = " + directionName);
+            //Debug.Log("Vector: " + directionVector + " = " + directionName);
 
             // Getting the list of all the potential gameobjects the neighbour could be
             List<GameObject> compareList = new List<GameObject>();
@@ -126,6 +114,9 @@ public static class WaveFunctionCollapse {
             }
             compareList = RemoveDuplicates(compareList);
 
+            if (compareList.Count == 1) {
+                Debug.Log("Compare List = 1");
+            }
 
             // Changing the neighbour list so it only contains valid gameobjects
             List<GameObject> newNeighbourList = new List<GameObject>();
@@ -139,6 +130,7 @@ public static class WaveFunctionCollapse {
                 }
             }
 
+            
             world[neighbour.x, neighbour.y] = newNeighbourList;
 
 
@@ -164,7 +156,7 @@ public static class WaveFunctionCollapse {
     }
 
 
-    // NoDuplicates Could be made Generic
+    // NoDuplicates could be made Generic
 
     private static List<GameObject> RemoveDuplicates(List<GameObject> list) {
 
@@ -306,7 +298,7 @@ public static class WaveFunctionCollapse {
 
         if (hasChanged) {
             foreach (Vector2Int neighbour in neighbours) {
-                world = Propagate(world, neighbour, iteration);
+                world = PropagateOld(world, neighbour, iteration);
             }        
         }
         
@@ -385,21 +377,34 @@ public static class WaveFunctionCollapse {
 
         //Debug.Log("Before: " + cell.Count);
 
-
-        Debug.Log("Collapse Wave");
+        /*
         foreach (GameObject item in cell) {
             Debug.Log(item.name);
         }
-        
-        int index = Random.Range(0, cell.Count);
+        */
 
-        Debug.Log("Random Number: " + index + ", Tile: " + cell[index].name);
+        if (cell.Count < 1) {
+            Debug.Log("List count was less than one");
+        }
+        int index = Random.Range(0, cell.Count);
+        
+
         Debug.Log("---------------------------------");
 
 
         List<GameObject> singleItem = new List<GameObject>();
         singleItem.Add(cell[index]);
-        //Debug.Log("After: " + singleItem.Count);
+
+
+        /*
+        Debug.Log("Item: " + singleItem[0].name);
+        Debug.Log("----------------------");
+        foreach (GameObject item in AvailableNeighbours.GetAvailableTiles(singleItem[0], AvailableNeighbours.Direction.North)) {
+            Debug.Log(item.name);
+        }
+        Debug.Log("+++++++++++++++++++++++++++++++");
+        */
+
         return singleItem;
 
     }

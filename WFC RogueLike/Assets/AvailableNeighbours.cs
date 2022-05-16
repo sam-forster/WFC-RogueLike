@@ -6,6 +6,7 @@ public class AvailableNeighbours : MonoBehaviour {
 
     public enum Direction { North, East, South, West}
 
+
     public List<GameObject> north;
     public List<GameObject> east;
     public List<GameObject> south;
@@ -39,9 +40,13 @@ public class AvailableNeighbours : MonoBehaviour {
 
 
         }
+
+        
     }
 
     
+
+
 
     public static List<GameObject> GetAvailableTiles(GameObject target, Direction direction) {
 

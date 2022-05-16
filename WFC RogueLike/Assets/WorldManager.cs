@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WorldManager : MonoBehaviour {
     [SerializeField] private List<GameObject> tiles;
-
+    public static List<GameObject> tileInstances;
 
     public static GameObject[,] grid;
     public static List<GameObject>[,] gridEntropy;
@@ -13,8 +13,8 @@ public class WorldManager : MonoBehaviour {
 
 
     private void Awake() {
-        width = 30;
-        height = 30;
+        width = 10;
+        height = 10;
 
 
         grid = new GameObject[width, height];
@@ -25,10 +25,13 @@ public class WorldManager : MonoBehaviour {
             }
         }
         ResetGridEntropy();
+        tileInstances = new List<GameObject>();
+
 
         foreach (GameObject tile in tiles) {
             GameObject tileInstance = Instantiate(tile, new Vector2(10000, 10000), Quaternion.identity);
-            Destroy(tileInstance);
+            tileInstances.Add(tileInstance);
+            //Destroy(tileInstance);
             
         }
         
@@ -37,7 +40,7 @@ public class WorldManager : MonoBehaviour {
 
     private void Start() {
 
-        GameObject start = tiles[2]; // NEED TO INSERT THE INDEX OF GROUND
+        GameObject start = tiles[1]; // NEED TO INSERT THE INDEX OF GROUND
         
         
         // TESTING THE DICTIONARY VALUES
@@ -76,7 +79,7 @@ public class WorldManager : MonoBehaviour {
 
         */
 
-        WaveFunctionCollapse.Initialise(gridEntropy, start);
+        //WaveFunctionCollapse.Initialise(gridEntropy, start);
 
         grid = WaveFunctionCollapse.Complete(gridEntropy);
         if (grid != null) {
@@ -86,6 +89,19 @@ public class WorldManager : MonoBehaviour {
 
         InstatiateWorld();
     }
+
+    /*
+    public static void DrawTile(List<GameObject>[,] world) {
+        for (int i = 0; i < world.GetLength(0); i++) {
+            for (int j = 0; j < world.GetLength(1); j++) {
+                if (world[i, j].Count == 1) {
+                    Instantiate(world[i, j][0], new Vector2(i, j), Quaternion.identity);
+                }
+            }
+        }
+    }
+    */
+
 
     public List<GameObject> GetTilePrefabs() {
         return tiles;
