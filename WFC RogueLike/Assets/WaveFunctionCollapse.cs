@@ -1,361 +1,197 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class WaveFunctionCollapse {
+public static  class WaveFunctionCollapse {
 
-    public static GameObject defaultTile;
-    private static bool canGo = true;
+    public static List<int>[,] InitialiseWorld(List<int>[,] startingWorld) {
 
-    public static List<GameObject>[,] Initialise(List<GameObject>[,] world) {
+        Vector2Int position = new Vector2Int((int)Mathf.Ceil(startingWorld.GetLength(0) / 2), (int)Mathf.Ceil(startingWorld.GetLength(1) / 2));
 
+        startingWorld[position.x, position.y] = new List<int>() { 1 };
+        //PrintWorld(startingWorld);
+        startingWorld = Propagate(startingWorld, position);
+        //PrintWorld(startingWorld);
 
-        Vector2Int position = new Vector2Int(world.GetLength(0) / 2, world.GetLength(1) / 2);
-        world[position.x, position.y] = new List<GameObject>();
-        world[position.x, position.y].Add(WorldManager.tileInstances[2]);
-
-        world = Propagate(world, position);
-        
-        return world;
-        Debug.Log("Initialise Complete");
+        return startingWorld;
     }
 
-    public static GameObject[,] Complete(List<GameObject>[,] potentialWorld) {
+    public static List<int>[,] FinishWorld(List<int>[,] world) {
 
-        potentialWorld = Initialise(potentialWorld);
-        Debug.Log("This Bit Was Passed");
+        List<int>[,] startingWorld = world;
+        
+        int width = world.GetLength(0);
+        int height = world.GetLength(1);
+
+        world = InitialiseWorld(world);
 
 
-        List<GameObject>[,] collapsedWorld = null;
+        for (int i = 0; i < width * height; i++) {
 
-        bool complete = false;
-        int count = 0;
+            if (ZeroEntropy(world)) {
+                Debug.Log("Zero Entropy Detected");
+                
+                //return FinishWorld(startingWorld);
 
-        collapsedWorld = Recursive_Complete(potentialWorld);
-        int max = potentialWorld.GetLength(0) * potentialWorld.GetLength(1);
-        for (int i = 0; i < max; i++) {
-            if (WorldComplete(collapsedWorld)) {
-                Debug.Log("WORLD COMPLETED in " + i + " calls");
-                break;
+                PrintWorld(world);
+                return world;
             }
-            /*
-            if (WorldNotPossible(collapsedWorld)) {
-                Debug.Log("WORLD NOT POSSIBLE, STILL RETURNING");                
-                return ConvertToSingleItemArray(collapsedWorld);
+            
+            if (WorldComplete(world)) {
+                Debug.Log("Completed in " + i + " iterations");
+                return world;
             }
-            */
-            collapsedWorld = Recursive_Complete(collapsedWorld);
+
+            Vector2Int position = GetPositionLowestEntropy(world);
+            world = CollapseWave(world, position);
+            world = Propagate(world, position);
+            //PrintWorld(world);
         }
-        
-        //Debug.Log("START OF WHILE");
 
-
-        return ConvertToSingleItemArray(collapsedWorld);
-    }
-
-    private static List<GameObject>[,] Recursive_Complete(List<GameObject>[,] world) {
-
-        if (WorldComplete(world)) {
-            return world;
-        }
-        /*
-        if (WorldNotPossible(world)) {
-            Debug.Log("World Not Possible");
-            return world;
-        }*/
-
-        Vector2Int position = FindLowestEntropy(world);
-        world[position.x, position.y] = CollapseWave(world[position.x, position.y]);
-        
-
-        world = Propagate(world, position);
-        
-        //world = Recursive_Complete(world);    //THIS IS THE RECURSIVE PART OF THIS METHOD
         return world;
 
     }
 
-    
-    private static List<GameObject>[,] Propagate(List<GameObject>[,] world, Vector2Int sourceCell, int iteration = 0) {
+    private static void PrintWorld(List<int>[,] world) {
 
-        iteration++;
-        bool changes = false;
-        List<Vector2Int> temp = FindValidNeighbours(world, sourceCell);
-        List<Vector2Int> neighbours = new List<Vector2Int>();
-        foreach (Vector2Int testNeighbour in temp) {
-            if (world[testNeighbour.x, testNeighbour.y].Count > 1) {
-                neighbours.Add(testNeighbour);
-            }
-        }
+        int x = -1;
+        int y = -1;
 
+        Debug.Log("--------------World------------------");
 
-        // Base Case
-        if (neighbours.Count == 0) {
-            Debug.Log("No Neighbours to Test");
-            return world;
-        }
+        for (int i = 0; i < world.GetLength(1); i++) {
 
-        List<Vector2Int> neighboursThatHaveChanged = new List<Vector2Int>();
+            string layer = "";
+            for (int j = 0; j < world.GetLength(0); j++) {
 
-        foreach (Vector2Int neighbour in neighbours) {
+                if (world[i, j].Count == 15) {
+                    layer = layer + "[ ]   ";
+                } else {
+                    layer = layer + "[" + world[i, j].Count + "]   ";
+                }
 
-
-            // Get the direction of the neighbour relative to the sourceCell
-            Vector2Int directionVector = neighbour - sourceCell;
-            AvailableNeighbours.Direction directionName = CalculateDirectionFromVector(directionVector);
-
-            //Debug.Log("Vector: " + directionVector + " = " + directionName);
-
-            // Getting the list of all the potential gameobjects the neighbour could be
-            List<GameObject> compareList = new List<GameObject>();
-            foreach (GameObject sourceGO in world[sourceCell.x, sourceCell.y]) {
-                compareList.AddRange(AvailableNeighbours.GetAvailableTiles(sourceGO, directionName));
+                if (world[i, j].Count == 0) {
+                    x = i;
+                    y = j;
+                }
                 
             }
-            compareList = RemoveDuplicates(compareList);
 
-            if (compareList.Count == 1) {
-                Debug.Log("Compare List = 1");
+            Debug.Log(layer);
+
+        }
+
+        Debug.Log("------------------------------------");
+        /*
+        if (x != -1) {
+            Debug.Log("Left:" + world[x - 1, y][0]);
+            Debug.Log("Up:" + world[x, y + 1][0]);
+            Debug.Log("Right:" + world[x + 1, y][0]);
+            Debug.Log("Down:" + world[x, y - 1][0]);
+        }
+
+        */
+
+    }
+
+    private static List<int>[,] Propagate(List<int>[,] world, Vector2Int position) {
+
+        List<int> listAtPosition = world[position.x, position.y];
+
+        List<Vector2Int> temp = FindValidNeighbours(world, position);
+        List<Vector2Int> neighbours = new List<Vector2Int>();
+
+        foreach (Vector2Int neighbour in temp) {
+            if (world[neighbour.x, neighbour.y].Count > 1) {
+                neighbours.Add(neighbour);
+            }
+        }
+
+        // Base Case 1
+        if (neighbours.Count == 0) {
+            //Debug.Log("Base Case 1");
+            return world;
+        }
+
+        List<Vector2Int> changedNeighbours = new List<Vector2Int>();
+
+        foreach (Vector2Int neighbour in neighbours) {
+            Vector2Int directionToNeighbour = neighbour - position;
+            Direction directionName = CalculateDirectionFromVector(directionToNeighbour);
+
+            List<int> compareList = new List<int>();
+            for (int i = 0; i < listAtPosition.Count; i++) {
+                compareList.AddRange(AvailableNeighbours2.GetValidTiles(listAtPosition[i], directionName));
             }
 
-            // Changing the neighbour list so it only contains valid gameobjects
-            List<GameObject> newNeighbourList = new List<GameObject>();
-            foreach (GameObject testGO in world[neighbour.x, neighbour.y]) {
-                if (compareList.Contains(testGO)) {
-                    newNeighbourList.Add(testGO);
-                } else {
-                    Debug.Log("Removed: " + testGO.name);
-                    changes = true;
-                    neighboursThatHaveChanged.Add(neighbour);
+            compareList = RemoveDuplicates(compareList);
+
+            List<int> currentNeighbours = world[neighbour.x, neighbour.y];
+            List<int> newNeighbours = new List<int>();
+
+            foreach (int item in currentNeighbours) {
+                if (compareList.Contains(item)) {
+                    newNeighbours.Add(item);
                 }
             }
 
-            
-            world[neighbour.x, neighbour.y] = newNeighbourList;
-
-
-            // TODO list
-            // Calculate the direction of the neighbour relative to the source - Done
-            // Reduce the neighbour to the correct available neighbours relative to the source cell - Done
-            // If a neighbour has been reduced, it needs to be a source of propagation - Done
-            // If no changes are made, then the world needs to be returned as a base case - Done
+            world[neighbour.x, neighbour.y] = newNeighbours;
         }
 
-        // Checking if any neighbours have changed.
-        // If they have, recursively call Propagate on each neighbour
-        neighboursThatHaveChanged = RemoveDuplicates(neighboursThatHaveChanged);
-        if (neighboursThatHaveChanged.Count > 0) {
-            foreach (Vector2Int neighbour in neighbours) {
-                world = Propagate(world, neighbour, iteration);
-            }
-        }
-        
-        // Base Case
+
         return world;
-
     }
 
+    private static List<int> RemoveDuplicates(List<int> list) {
 
-    // NoDuplicates could be made Generic
-
-    private static List<GameObject> RemoveDuplicates(List<GameObject> list) {
-
-        List<GameObject> noDuplicates = new List<GameObject>();
-        foreach (GameObject item in list) {
+        List<int> noDuplicates = new List<int>();
+        foreach (int item in list) {
             if (!noDuplicates.Contains(item)) {
                 noDuplicates.Add(item);
             }
         }
         return noDuplicates;
+
     }
 
-    private static List<Vector2Int> RemoveDuplicates(List<Vector2Int> list) {
-        List<Vector2Int> noDuplicates = new List<Vector2Int>();
-        foreach (Vector2Int item in list) {
-            if (!noDuplicates.Contains(item)) {
-                noDuplicates.Add(item);
-            }
-        }
-        return noDuplicates;
-    }
-
-    private static AvailableNeighbours.Direction CalculateDirectionFromVector(Vector2Int directionVector) {
+    private static Direction CalculateDirectionFromVector(Vector2Int directionVector) {
 
         if (directionVector.Equals(Vector2Int.up)) {
-            return AvailableNeighbours.Direction.North;
+            return Direction.North;
         }
         if (directionVector.Equals(Vector2Int.down)) {
-            return AvailableNeighbours.Direction.South;
+            return Direction.South;
         }
         if (directionVector.Equals(Vector2Int.left)) {
-            return AvailableNeighbours.Direction.West;
+            return Direction.West;
         }
         if (directionVector.Equals(Vector2Int.right)) {
-            return AvailableNeighbours.Direction.East;
+            return Direction.East;
         }
 
         Debug.LogError("WTF have you inputted??");
         Debug.Log(directionVector);
 
-        return AvailableNeighbours.Direction.North;
-
-
-    }
-
-
-
-
-    // Recursive algorithm that propagates updates of the world each time a new tiles entropy is changed
-
-    // PROBLEMS: SEEMS TO RECURSE INFINITELY - Sorted... I think
-    private static List<GameObject>[,] PropagateOld(List<GameObject>[,] world, Vector2Int center, int iteration = 0) {
-
-        //changedFlags[center.x, center.y] = true;
-        iteration++;
-        //Debug.Log("Iteration: " + iteration);
-        //Debug.Log(center);
-
-
-        List<Vector2Int> neighbours = FindValidNeighbours(world, center);
-        //bool[] neighbourFlags = new bool[neighbours.Count];   // Flags true if any of the neighbours are changed in this pass
-        bool hasChanged = false;
-
-
-
-
-        List<Vector2Int> temp = new List<Vector2Int>();     //Remove neighbours that have already been checked
-        
-        
-        foreach (Vector2Int neighbour in neighbours) {
-            if (world[neighbour.x, neighbour.y].Count >= world[center.x, center.y].Count) {
-                temp.Add(neighbour);
-            }
-        }
-
-        neighbours = temp;
-        
-        //temp = null;
-        
-
-
-        // Base Case
-        if (neighbours.Count == 0) {
-            //Debug.Log("Position: "+ center + "Neighbours are 0");
-            return world;
-        }
-
-        List<GameObject> centerList = world[center.x, center.y];
-        List<GameObject> target = new List<GameObject>();
-        AvailableNeighbours.Direction directionName = AvailableNeighbours.Direction.North;
-
-
-        int counter = -1;
-        foreach (Vector2Int neighbour in neighbours) {
-
-            counter++;
-
-            Vector2Int directionVector = neighbour - center;
-            target = world[center.x + directionVector.x, center.y + directionVector.y];
-            List<GameObject> newTargetList = new List<GameObject>();
-
-
-            if (directionVector.Equals(Vector2Int.down)) {
-                directionName = AvailableNeighbours.Direction.South;
-            }
-            if (directionVector.Equals(Vector2Int.up)) {
-                directionName = AvailableNeighbours.Direction.North;
-            }
-            if (directionVector.Equals(Vector2Int.left)) {
-                directionName = AvailableNeighbours.Direction.West;
-            }
-            if (directionVector.Equals(Vector2Int.right)) {
-                directionName = AvailableNeighbours.Direction.East;
-            }
-
-
-            List<GameObject> neighbourPossibles = new List<GameObject>();
-            foreach (GameObject centerTile in centerList) {
-                List<GameObject> viables = AvailableNeighbours.GetAvailableTiles(centerTile, directionName);
-                foreach (GameObject viable in viables) {
-                    if (!neighbourPossibles.Contains(viable)) {
-                        neighbourPossibles.Add(viable);
-                    }
-                }
-
-            }
-
-            
-
-            if (!AreListsEqual(neighbourPossibles, target)) {
-                hasChanged = true;
-                
-            }
-
-            world[neighbour.x, neighbour.y] = neighbourPossibles;
-
-        }
-        
-
-        if (hasChanged) {
-            foreach (Vector2Int neighbour in neighbours) {
-                world = PropagateOld(world, neighbour, iteration);
-            }        
-        }
-        
-
-        return world;
-        
-    }
-
-    private static GameObject[,] ConvertToSingleItemArray(List<GameObject>[,] world) {
-
-        Debug.Log("ConvertToSingleItemArray");
-
-        int width = world.GetLength(0);
-        int height = world.GetLength(1);
-        GameObject[,] completeList = new GameObject[width, height];
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                completeList[i, j] = world[i, j][0];
-            }
-        }
-
-        return completeList;
+        return Direction.North;
 
     }
 
-    private static bool AreListsEqual(List<GameObject> listOne, List<GameObject> listTwo) {
-        if (listOne.Count != listTwo.Count) {
-            return false;
-        }
-
-        for (int i = 0; i < listOne.Count; i++) {
-            if (!listOne[i].Equals(listTwo[i])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-
-
-    private static List<Vector2Int> FindValidNeighbours(List<GameObject>[,] world, Vector2Int center, bool diagonalsIncluded = false) {
+    private static List<Vector2Int> FindValidNeighbours(List<int>[,] world, Vector2Int center, bool diagonalsIncluded = false) {
 
         List<Vector2Int> list = new List<Vector2Int>();
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
 
-                if ((i == 0 && j == 0)                   ||
-                    (center.x + i < 0)                   ||
+                if ((i == 0 && j == 0) ||
+                    (center.x + i < 0) ||
                     (center.x + i >= world.GetLength(0)) ||
-                    (center.y + j < 0)                   ||
+                    (center.y + j < 0) ||
                     (center.y + j >= world.GetLength(1))) {
 
                     continue;
 
-                } else if(!diagonalsIncluded) {
+                } else if (!diagonalsIncluded) {
 
                     if (Mathf.Abs(i) == Mathf.Abs(j)) {
                         continue;
@@ -363,7 +199,7 @@ public static class WaveFunctionCollapse {
                 }
 
                 list.Add(new Vector2Int(center.x + i, center.y + j));
-                
+
             }
         }
         //Debug.Log(list.Count);
@@ -371,73 +207,32 @@ public static class WaveFunctionCollapse {
 
     }
 
-    
 
-    private static List<GameObject> CollapseWave(List<GameObject> cell) {
+    private static List<int>[,] CollapseWave(List<int>[,] world, Vector2Int position) {
 
-        //Debug.Log("Before: " + cell.Count);
+        List<int> list = world[position.x, position.y];
 
-        /*
-        foreach (GameObject item in cell) {
-            Debug.Log(item.name);
-        }
-        */
+        int index = UnityEngine.Random.Range(0, list.Count);
+        list = new List<int>() { list[index] };
 
-        if (cell.Count < 1) {
-            Debug.Log("List count was less than one");
-        }
-        int index = Random.Range(0, cell.Count);
-        
-
-        Debug.Log("---------------------------------");
-
-
-        List<GameObject> singleItem = new List<GameObject>();
-        singleItem.Add(cell[index]);
-
-
-        /*
-        Debug.Log("Item: " + singleItem[0].name);
-        Debug.Log("----------------------");
-        foreach (GameObject item in AvailableNeighbours.GetAvailableTiles(singleItem[0], AvailableNeighbours.Direction.North)) {
-            Debug.Log(item.name);
-        }
-        Debug.Log("+++++++++++++++++++++++++++++++");
-        */
-
-        return singleItem;
+        world[position.x, position.y] = list;
+        return world;
 
     }
 
-    private static Vector2Int FindLowestEntropy(List<GameObject>[,] world) {
-        Vector2Int position = new Vector2Int(Random.Range(0, world.GetLength(0)),Random.Range(0, world.GetLength(1)));
-        int lowest = int.MaxValue;
-
-        for (int i = 0; i < world.GetLength(0); i++) {
-            for (int j = 0; j < world.GetLength(1); j++) {
-                if (world[i, j].Count == 0) {
-                    Debug.Log("0 Entropy Found");
-                }
+    private static bool WorldComplete(List<int>[,] world) {
+        int width = world.GetLength(0);
+        int height = world.GetLength(1);
 
 
-                if (world[i, j].Count < lowest && world[i, j].Count > 1) {
-                    position = new Vector2Int(i, j);
-                    lowest = world[i, j].Count;
-                }
-            }
-        }
-        return position;
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
 
-    }
-
-    private static bool WorldComplete(List<GameObject>[,] world) {
-
-        for (int i = 0; i < world.GetLength(0); i++) {
-            for (int j = 0; j < world.GetLength(1); j++) {
-
-                if (world[i,j].Count > 1 || world[i,j].Count == 0) {
+                if (world[i, j].Count > 1) {
+                    //Debug.Log("World Incomplete");
                     return false;
                 }
+
             }
         }
 
@@ -445,18 +240,69 @@ public static class WaveFunctionCollapse {
 
     }
 
-    private static bool WorldNotPossible(List<GameObject>[,] world) {
-        for (int i = 0; i < world.GetLength(0); i++) {
-            for (int j = 0; j < world.GetLength(1); j++) {
+    private static bool ZeroEntropy(List<int>[,] world) {
+        int width = world.GetLength(0);
+        int height = world.GetLength(1);
+
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
 
                 if (world[i, j].Count == 0) {
+                    //Debug.Log("World Incomplete");
                     return true;
                 }
+
             }
         }
 
         return false;
+    }
+
+    private static int[,] ConvertTo2D(List<int>[,] world) {
+        int width = world.GetLength(0);
+        int height = world.GetLength(1);
+
+        int[,] returnWorld = new int[width, height];
+        
+        
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+
+                returnWorld[i, j] = world[i, j][0];
+
+            }
+        }
+
+        return returnWorld;
 
     }
+
+    private static Vector2Int GetPositionLowestEntropy(List<int>[,] world) {
+        int width = world.GetLength(0);
+        int height = world.GetLength(1);
+
+
+        Vector2Int lowestPosition = new Vector2Int(0, 0);
+        int lowestValue = int.MaxValue;
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+
+                if (world[i,j].Count > 1 && world[i, j].Count < lowestValue) {
+
+                    lowestValue = world[i, j].Count;
+                    lowestPosition = new Vector2Int(i, j);
+
+                }
+            }
+        }
+
+        return lowestPosition;
+
+
+    }
+
+
 
 }

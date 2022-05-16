@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5754084414118475033
+--- !u!1 &3119120181550628217
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,9 +8,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7306526694899217216}
-  - component: {fileID: 2615343647287502045}
-  - component: {fileID: -5562252171560999058}
+  - component: {fileID: 1002346024156760147}
+  - component: {fileID: 1617085318464640325}
+  - component: {fileID: 5237935781738226778}
+  - component: {fileID: -6059986601134237869}
   m_Layer: 0
   m_Name: Wall_Full
   m_TagString: Untagged
@@ -18,13 +19,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7306526694899217216
+--- !u!4 &1002346024156760147
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5754084414118475033}
+  m_GameObject: {fileID: 3119120181550628217}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -32,13 +33,13 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &2615343647287502045
+--- !u!212 &1617085318464640325
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5754084414118475033}
+  m_GameObject: {fileID: 3119120181550628217}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -83,35 +84,40 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-5562252171560999058
+--- !u!114 &5237935781738226778
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5754084414118475033}
+  m_GameObject: {fileID: 3119120181550628217}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43dc6e3f90e05e740a9261f994c8028c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 3
   north:
-  - {fileID: 840768720078023997, guid: 58ca390e1de984543a34e64be24a06c4, type: 3}
   - {fileID: 2884555291484091927, guid: 0b9b49b7db8a6854daff0bd090eb35dd, type: 3}
-  - {fileID: 5587114721551724707, guid: d9fa55cb1ec0fc84f857293d575b61fb, type: 3}
-  - {fileID: 3763158822719778408, guid: d11b643c01ee1df4c9cb7a5bee96b804, type: 3}
   east:
-  - {fileID: 840768720078023997, guid: 58ca390e1de984543a34e64be24a06c4, type: 3}
   - {fileID: 4561563576768085424, guid: e57acf345cd49fc478a44c4de46b72cf, type: 3}
-  - {fileID: 3763158822719778408, guid: d11b643c01ee1df4c9cb7a5bee96b804, type: 3}
-  - {fileID: 5587114721551724707, guid: d9fa55cb1ec0fc84f857293d575b61fb, type: 3}
   south:
-  - {fileID: 840768720078023997, guid: 58ca390e1de984543a34e64be24a06c4, type: 3}
   - {fileID: 7447183712137761513, guid: 17bed1a95ff68bc439357d66001f5ac8, type: 3}
-  - {fileID: 6107513835954189935, guid: 125183506c1453d4bad6c5fab22a38c4, type: 3}
-  - {fileID: 7407420030013200721, guid: af53d33745840e3449cdf7978ad40879, type: 3}
   west:
-  - {fileID: 840768720078023997, guid: 58ca390e1de984543a34e64be24a06c4, type: 3}
   - {fileID: 3566712076160608182, guid: a99c49dbede866a4f979a0858ec252cf, type: 3}
-  - {fileID: 7407420030013200721, guid: af53d33745840e3449cdf7978ad40879, type: 3}
-  - {fileID: 3763158822719778408, guid: d11b643c01ee1df4c9cb7a5bee96b804, type: 3}
+--- !u!114 &-6059986601134237869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3119120181550628217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a834bfca663adc848a408622cfea1dae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NorthInt: 0700000003000000
+  EastInt: 0a00000003000000
+  SouthInt: 0400000003000000
+  WestInt: 0200000003000000

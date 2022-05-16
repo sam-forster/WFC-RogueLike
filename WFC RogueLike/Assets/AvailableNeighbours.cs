@@ -2,16 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Direction { North, East, South, West }
+
 public class AvailableNeighbours : MonoBehaviour {
 
-    public enum Direction { North, East, South, West}
-
+    public int id;
 
     public List<GameObject> north;
     public List<GameObject> east;
     public List<GameObject> south;
     public List<GameObject> west;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
     private Dictionary<Direction, List<GameObject>> validTilesInDirection;
     public static Dictionary<string, Dictionary<Direction, List<GameObject>>> TileAvailableNeighbours;
 
@@ -61,5 +78,7 @@ public class AvailableNeighbours : MonoBehaviour {
         }
         
     }
+
+    */
 
 }

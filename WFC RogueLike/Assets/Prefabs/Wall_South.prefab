@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5310854837888168016}
   - component: {fileID: 6238389668793430994}
-  - component: {fileID: 3379039300244749949}
+  - component: {fileID: 2598389813439995037}
+  - component: {fileID: -780706660512649033}
   m_Layer: 0
   m_Name: Wall_South
   m_TagString: Untagged
@@ -83,7 +84,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3379039300244749949
+--- !u!114 &2598389813439995037
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -95,13 +96,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43dc6e3f90e05e740a9261f994c8028c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 7
   north:
-  - {fileID: 4490102356589283298, guid: 1ba500f450712ae4f9323f3cc2fdb313, type: 3}
+  - {fileID: 7052196895865059993, guid: f7e1d73dc01845d4788402631ebd44a5, type: 3}
   east:
   - {fileID: 2884555291484091927}
   - {fileID: 5587114721551724707, guid: d9fa55cb1ec0fc84f857293d575b61fb, type: 3}
+  - {fileID: 323481480890044359, guid: 4eff0a947bef9254ab15cc2f3e76d227, type: 3}
   south:
-  - {fileID: 5754084414118475033, guid: ddac0f4dee9d98f469563711087865c1, type: 3}
+  - {fileID: 3119120181550628217, guid: ddac0f4dee9d98f469563711087865c1, type: 3}
   west:
   - {fileID: 2884555291484091927}
   - {fileID: 3763158822719778408, guid: d11b643c01ee1df4c9cb7a5bee96b804, type: 3}
+  - {fileID: 8728336296572815237, guid: 82430faec9839624d9f78a08fb0ba34c, type: 3}
+--- !u!114 &-780706660512649033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2884555291484091927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a834bfca663adc848a408622cfea1dae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NorthInt: 01000000
+  EastInt: 0700000008000000
+  SouthInt: 03000000
+  WestInt: 0700000009000000
