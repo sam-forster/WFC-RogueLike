@@ -235,8 +235,20 @@ public static  class WaveFunctionCollapse {
 
         List<int> list = world[position.x, position.y];
 
-        int index = UnityEngine.Random.Range(0, list.Count);
-        list = new List<int>() { list[index] };
+        int bias = 0;
+        
+        if (list.Contains(1)) {
+            bias = 10;
+        }
+
+        int index = UnityEngine.Random.Range(0, list.Count + bias);
+        if (index >= list.Count) {
+            list = new List<int>() { 1 };
+        } else {
+            list = new List<int>() { list[index] };
+        }
+        
+        
 
         world[position.x, position.y] = list;
         return world;

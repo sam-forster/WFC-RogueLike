@@ -99,12 +99,14 @@ MonoBehaviour:
   id: 12
   north:
   - {fileID: 7052196895865059993, guid: f7e1d73dc01845d4788402631ebd44a5, type: 3}
+  - {fileID: 2172002088000276997, guid: a8feed441c4a1604dabc7738c6611a23, type: 3}
   east:
   - {fileID: 2884555291484091927, guid: 0b9b49b7db8a6854daff0bd090eb35dd, type: 3}
   south:
   - {fileID: 3566712076160608182, guid: a99c49dbede866a4f979a0858ec252cf, type: 3}
   west:
   - {fileID: 7052196895865059993, guid: f7e1d73dc01845d4788402631ebd44a5, type: 3}
+  - {fileID: 323481480890044359, guid: 4eff0a947bef9254ab15cc2f3e76d227, type: 3}
 --- !u!114 &234676892454132583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,7 +119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a834bfca663adc848a408622cfea1dae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NorthInt: 
-  EastInt: 
-  SouthInt: 
-  WestInt: 
+  NorthInt: 01000000
+  EastInt: 07000000
+  SouthInt: 02000000
+  WestInt: 01000000
