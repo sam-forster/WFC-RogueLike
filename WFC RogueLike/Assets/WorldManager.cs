@@ -1,14 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class WorldManager : MonoBehaviour {
     [SerializeField] public List<GameObject> tiles;
     public GameObject problemCell;
+    public GameObject undefinedCell;
 
 
 
     public GameObject[,] grid;
+    public GameObject[,] previousGrid;
     public int[,] gridIds;
     //public static List<GameObject>[,] gridEntropy;
     public List<int>[,] gridWithEntropy;
@@ -16,13 +20,14 @@ public class WorldManager : MonoBehaviour {
 
     public int width;
     public int height;
-    private bool foundWorld = false;
+    public bool foundWorld = false;
+    private bool canRun = true;
     private int iteration = 0;
 
 
     private void Awake() {
-        width = 11;
-        height = 11;
+        width = 35;
+        height = 35;
 
 
         gridWithEntropy = new List<int>[width, height];
@@ -37,6 +42,7 @@ public class WorldManager : MonoBehaviour {
             }
         }
         grid = new GameObject[width, height];
+        previousGrid = new GameObject[width, height];
         gridIds = new int[width, height];
 
         
@@ -47,53 +53,87 @@ public class WorldManager : MonoBehaviour {
 
     }
 
-    /*
-
-    private void Start() {
-        List<int>[,] finishedWorld = WaveFunctionCollapse.FinishWorld(gridWithEntropy);
-        InstantiateWorld(finishedWorld);
-    }
-    */
     
     private void Update() {
 
-        if (!foundWorld) {
-
-            gridWithEntropy = new List<int>[width, height];
-            for (int i = 0; i < width; i++) {
-                for (int j = 0; j < height; j++) {
-
-                    gridWithEntropy[i, j] = new List<int>();
-
-                    for (int k = 0; k < tiles.Count; k++) {
-                        gridWithEntropy[i, j].Add(k);       // NEEDS TO BE CHANGED IF IDs ARE CHANGED
-                    }
-                }
-            }
-
-
-            List<int>[,] finishedWorld = WaveFunctionCollapse.FinishWorld(gridWithEntropy);
-            InstantiateWorld(finishedWorld, iteration);
-            if (CompleteWorld(finishedWorld)) {
-                foundWorld = true;
-            } else {
-                iteration++;
-                StartCoroutine(Delay());
-            }
+        if (Input.GetKeyDown(KeyCode.R)) {
+            SceneManager.LoadScene(0);
         }
 
+        if (!canRun) {
+            return;
+        }
+
+        if (!foundWorld) {
+            iteration++;
+            gridWithEntropy = WaveFunctionCollapse.FinishWorld(gridWithEntropy);
+            InstantiateWorld2(gridWithEntropy);
+            if (!CompleteWorld(gridWithEntropy)) {
+                StartCoroutine(Delay());
+            } else {
+                foundWorld = true;
+                StartCoroutine(Delay());
+                
+            }
+            
+            
+        }
         
 
     }
+
+    private void InstantiateWorld2(List<int>[,] world) {
+
+        previousGrid = grid;
+        grid = new GameObject[width, height];
+        
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+
+                if (world[i, j].Count == 1) {
+                    GameObject go = Instantiate(tiles[world[i, j][0]], new Vector2(i, j), Quaternion.identity);
+                    grid[i, j] = go;
+                }else if (world[i, j].Count > 0) {
+                    GameObject go = Instantiate(undefinedCell, new Vector2(i, j), Quaternion.identity);
+                    grid[i, j] = go;
+                }
+
+            }
+        }
+    }
+   
+
     
-    public IEnumerator Delay() {
-        foundWorld = true;
-        yield return new WaitForSeconds(1f);
-        foundWorld = false;
+    private void InstantiateWorld(List<int>[,] world, int iteration) {
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+
+                if (world[i,j].Count == 1) {
+                    GameObject go = Instantiate(tiles[world[i, j][0]], new Vector2(width * iteration + i, j), Quaternion.identity);
+                    grid[i, j] = go;
+                } else if (world[i,j].Count > 1) {
+                    GameObject go = Instantiate(tiles[4], new Vector2(width * iteration + i, j), Quaternion.identity);
+                    grid[i, j] = go;
+                } else {
+                    GameObject go = Instantiate(problemCell, new Vector2(width * iteration + i, j), Quaternion.identity);
+                    
+                    grid[i, j] = go;
+                }
+                
+            }
+        }
     }
 
+    public IEnumerator Delay() {
+        canRun = false;
+        yield return new WaitForSeconds(Time.deltaTime);
 
-
+        foreach (GameObject item in previousGrid) {
+            
+            Destroy(item);
+        }
+        canRun = true;
+    }
 
     public List<GameObject> GetTilePrefabs() {
         return tiles;
@@ -113,28 +153,6 @@ public class WorldManager : MonoBehaviour {
 
         return true;
 
-    }
-    private void InstantiateWorld(List<int>[,] world, int iteration) {
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-
-                if (world[i,j].Count == 1) {
-                    GameObject go = Instantiate(tiles[world[i, j][0]], new Vector2(width * iteration + i, j), Quaternion.identity);
-                    grid[i, j] = go;
-                } else if (world[i,j].Count > 1) {
-                    GameObject go = Instantiate(tiles[0], new Vector2(width * iteration + i, j), Quaternion.identity);
-                    grid[i, j] = go;
-                } else {
-                    GameObject go = Instantiate(problemCell, new Vector2(width * iteration + i, j), Quaternion.identity);
-                    
-                    grid[i, j] = go;
-                }
-
-
-                
-                
-            }
-        }
     }
 
     private void InstantiateWorld() {

@@ -252,8 +252,10 @@ MonoBehaviour:
   - {fileID: 556453763625615199, guid: 1ad0785455c8ea44e8b552a9123d6d90, type: 3}
   - {fileID: 2172002088000276997, guid: a8feed441c4a1604dabc7738c6611a23, type: 3}
   problemCell: {fileID: 4537005861229960413, guid: 899266552d35f574b999f19611097405, type: 3}
+  undefinedCell: {fileID: 4664436441964032512, guid: 58ca390e1de984543a34e64be24a06c4, type: 3}
   width: 0
   height: 0
+  foundWorld: 0
 --- !u!4 &1915779668
 Transform:
   m_ObjectHideFlags: 0

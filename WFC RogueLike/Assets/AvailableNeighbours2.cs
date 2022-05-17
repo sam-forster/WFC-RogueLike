@@ -39,12 +39,25 @@ public class AvailableNeighbours2 : MonoBehaviour {
             WestInt.Add(neighbour.GetComponent<AvailableNeighbours>().id);
         }
 
-        Dict_GetList.Add(Direction.North, NorthInt);
-        Dict_GetList.Add(Direction.East, EastInt);
-        Dict_GetList.Add(Direction.South, SouthInt);
-        Dict_GetList.Add(Direction.West, WestInt);
+        if (!Dict_GetList.ContainsKey(Direction.North)) {
+            Dict_GetList.Add(Direction.North, NorthInt);
+        }
+        if (!Dict_GetList.ContainsKey(Direction.East)) {
+            Dict_GetList.Add(Direction.East, EastInt);
+        }
+        if (!Dict_GetList.ContainsKey(Direction.South)) {
+            Dict_GetList.Add(Direction.South, SouthInt);
+        }
+        if (!Dict_GetList.ContainsKey(Direction.West)) {
+            Dict_GetList.Add(Direction.West, WestInt);
+        }
 
-        Dict_ID_Direction.Add(gameObject.GetComponent<AvailableNeighbours>().id, Dict_GetList);
+        if (!Dict_ID_Direction.ContainsKey(gameObject.GetComponent<AvailableNeighbours>().id)) {
+            Dict_ID_Direction.Add(gameObject.GetComponent<AvailableNeighbours>().id, Dict_GetList);
+        }
+
+
+        
 
     }
 

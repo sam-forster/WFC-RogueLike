@@ -26,7 +26,9 @@ public static  class WaveFunctionCollapse {
 
         world = InitialiseWorld(world);
 
+        return StepThrough(world);
 
+        /*
         for (int i = 0; i < width * height; i++) {
 
             if (ZeroEntropy(world)) {
@@ -50,7 +52,20 @@ public static  class WaveFunctionCollapse {
         }
 
         return world;
+        */
+    }
 
+    public static List<int>[,] StepThrough(List<int>[,] world) {
+        int width = world.GetLength(0);
+        int height = world.GetLength(1);
+
+
+
+        Vector2Int position = GetPositionLowestEntropy(world);
+        world = CollapseWave(world, position);
+        world = Propagate(world, position);
+
+        return world;
     }
 
     private static void PrintWorld(List<int>[,] world) {
@@ -140,15 +155,13 @@ public static  class WaveFunctionCollapse {
 
             world[neighbour.x, neighbour.y] = newNeighbours;
         }
-        /*
+        
         if (changedNeighbours.Count > 0) {
             foreach (Vector2Int neighbour in changedNeighbours) {
                 world = Propagate(world, neighbour);
             }
-            
-            
         }
-        */
+        
 
         return world;
     }
