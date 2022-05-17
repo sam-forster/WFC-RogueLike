@@ -26,8 +26,8 @@ public class WorldManager : MonoBehaviour {
 
 
     private void Awake() {
-        width = 35;
-        height = 35;
+        width = 31;
+        height = 31;
 
 
         gridWithEntropy = new List<int>[width, height];
@@ -59,6 +59,7 @@ public class WorldManager : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.R)) {
             SceneManager.LoadScene(0);
         }
+
 
         if (!canRun) {
             return;
@@ -127,6 +128,7 @@ public class WorldManager : MonoBehaviour {
     public IEnumerator Delay() {
         canRun = false;
         yield return new WaitForSeconds(Time.deltaTime);
+        
 
         foreach (GameObject item in previousGrid) {
             

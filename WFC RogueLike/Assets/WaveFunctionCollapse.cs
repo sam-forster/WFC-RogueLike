@@ -28,31 +28,6 @@ public static  class WaveFunctionCollapse {
 
         return StepThrough(world);
 
-        /*
-        for (int i = 0; i < width * height; i++) {
-
-            if (ZeroEntropy(world)) {
-                Debug.Log("Zero Entropy Detected");
-                
-                //return FinishWorld(startingWorld);
-
-                PrintWorld(world);
-                return world;
-            }
-            
-            if (WorldComplete(world)) {
-                Debug.Log("Completed in " + i + " iterations");
-                return world;
-            }
-
-            Vector2Int position = GetPositionLowestEntropy(world);
-            world = CollapseWave(world, position);
-            world = Propagate(world, position);
-            //PrintWorld(world);
-        }
-
-        return world;
-        */
     }
 
     public static List<int>[,] StepThrough(List<int>[,] world) {
@@ -98,15 +73,7 @@ public static  class WaveFunctionCollapse {
         }
 
         Debug.Log("------------------------------------");
-        /*
-        if (x != -1) {
-            Debug.Log("Left:" + world[x - 1, y][0]);
-            Debug.Log("Up:" + world[x, y + 1][0]);
-            Debug.Log("Right:" + world[x + 1, y][0]);
-            Debug.Log("Down:" + world[x, y - 1][0]);
-        }
-
-        */
+        
 
     }
 
@@ -238,7 +205,7 @@ public static  class WaveFunctionCollapse {
         int bias = 0;
         
         if (list.Contains(1)) {
-            bias = 10;
+            bias = 5;
         }
 
         int index = UnityEngine.Random.Range(0, list.Count + bias);
